@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Vue.js Pet Depot</title>
+    <script src="https://unpkg.com/vue@2"></script>
+    <link rel="stylesheet" type="text/css" href="assets/css/app.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</head>
+<body>
+  <div id="app">
+      <header>
+          <div class="navbar navbar-default">
+              <h1>{{sitename}}</h1>
+          </div>
+          <div class="nav navbar-nav navbar-right cart">
+              <span class="glyphicon glyphicon-shopping-cart">
+                  {{ cartItemCount}}
+              </span>
+          </div>
+      </header>
+      <main>
+          <div class="col">
+              <figure>
+                  <img v-bind:src="product.image">
+              </figure>
+          </div>
+          <div class="col col-expand">
+              <h1 v-text="product.title"></h1>
+              <p v-html="product.description"></p>
+              <p class="price">
+                  {{ product.price | formatPrice}}
+              </p>
+              <!--<button class="default"
+                      v-on:click="addToCart"
+                      v-show="canAddToCart">Add to cart</button>-->
+              <button v-if="canAddToCart">Add to cart</button>
+              <button class="btn btn-primary btn-lg"
+                      v-on:click="addToCart"
+                      v-else-if="canAddToCart">Add  to cart</button>
+              <button disabled="true" class="btn btn-primary btn-lg"
+                      v-else>Add to cart</button>
+              <span class="inventory-message"
+                    v-if="product.availableInventory - cartItemCount === 0">All Out!</span>
+              <span class="inventory-message"
+                    v-else>Buy Now!</span>
+              <div class="rating">
+                  <span v-for="n in 5">☆</span>
+              </div>
+          </div>
+      </main>
+  </div>
+  <script type="text/javascript">
+      var webstore = new Vue({
+          el: '#app',
+          data: {
+              showProduct: true,
+              sitename: 'Vue.js Pet Depot',
+              product: {
+                  id: 1001,
+                  title: "Cat food, 1,8 kg",
+                  description: "A 1,8 kg bag of <em>irresistible</em>, " +
+                      "organic goodness for your cat.",
+                  price: 2000,
+                  image: "https://github.com/ErikCH/VuejsInActionCode/raw/master/chapter-02/assets/images/product-fullsize.png",
+                  availableInventory: 5,
+                  rating: 3
+              },
+              cart: []
+          },
+          filters: {
+              formatPrice: function (price) {
+                  if (!parseInt(price)) {return ""}
+                  if (price > 99999) {
+                      var  priceString = (price / 100).toFixed(2);
+                      var  priceArray =  priceString.split("").reverse();
+                      var index = 3;
+                      while (priceArray.length > index + 3) {
+                          priceArray.splice(index + 3, 0, ",");
+                          index += 4
+                      }
+                      return "$" + priceArray.reverse().join("")
+                  } else {
+                      return "$" + (price / 100).toFixed(2)
+                  }
+              }
+          },
+          methods: {
+              addToCart: function () {
+                  this.cart.push( this.product.id );
+              },
+              showCheckout() {
+                  this.showProduct = !this.showProduct
+              }
+          },
+          computed: {
+              cartItemCount: function () {
+                  return this.cart.length || ''
+              },
+              canAddToCart: function () {
+                  return this.product.availableInventory > this.cartItemCount
+              }
+          }
+      });
+  </script>
+</body>
+</html>
